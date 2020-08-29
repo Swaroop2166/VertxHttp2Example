@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="create_run_jar" name="Create binaries for Vertx Client" basedir=".">
+
+
+	<property name="node.name" value="VertxClient" />
+	<property name="node.version" value="1.0.0" />
+	<property name="node.path" value="${node.name}-${node.version}" />
+	<property name="binary.name" value="VertxHttp2Client.jar" />
+
+	<target name="init">
+		<mkdir dir="${basedir}/dist/${node.path}" />
+		<mkdir dir="${basedir}/bin" />
+		<mkdir dir="${basedir}/classes" />
+	</target>
+
+	 
+	<path id="project.class.path">
+			<fileset dir="${basedir}/lib">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+	<target name="compile" depends="init">
+			<delete>
+				<fileset dir="${basedir}/classes" />
+			</delete>
+			<javac includejavaruntime="true" includeantruntime="true" compiler="javac1.8" srcdir="${basedir}/src" destdir="${basedir}/classes" debug="on">
+				<classpath refid="project.class.path" />
+			</javac>
+		</target>
+	<target name="create_run_jar" depends="init,compile">
+		<jar destfile="${basedir}/dist/${node.path}/bin/${binary.name}" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="com.vertx.http2.server.Http2VertxLoadClient" />
+				<attribute name="Class-Path" value="." />
+			</manifest>
+			<fileset dir="${basedir}/classes" />
+		
+		</jar>
+		<checksum file="${basedir}/dist/${node.path}/bin/${binary.name}" property="${binary.name}" />
+		<echo file="${basedir}/dist/${node.path}/bin/checksum.md5" append="true">${${binary.name}}  ${binary.name}&#10; </echo>
+		<delete>
+			<fileset dir="${basedir}/classes" />
+		</delete>
+	</target>
+</project>
